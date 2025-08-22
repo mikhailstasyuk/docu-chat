@@ -26,11 +26,10 @@ class WeaviateService:
         self.openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.embedding_model = "text-embedding-ada-002"
 
-    # --- ADD connect() and close() methods for lifespan management ---
     def connect(self):
         """Connects to the Weaviate instance."""
         self.weaviate_client.connect()
-        self._setup_schema() # Setup schema after connecting
+        self._setup_schema()
 
     def close(self):
         """Closes the connection to the Weaviate instance."""
@@ -40,10 +39,7 @@ class WeaviateService:
         """
         Ensures the required collection exists in Weaviate.
         """
-        collections = self.weaviate_client.collections.list_all()
-        collection_names = [c.name for c in collections]
-
-        if WEAVIATE_CLASS_NAME not in collection_names:
+        if not self.weaviate_client.collections.exists(WEAVIATE_CLASS_NAME):
             self.weaviate_client.collections.create(
                 name=WEAVIATE_CLASS_NAME,
                 description="A chunk of text from an uploaded document.",
@@ -56,14 +52,18 @@ class WeaviateService:
             print(f"Collection '{WEAVIATE_CLASS_NAME}' created.")
 
     async def _get_embedding(self, text: str) -> List[float]:
-        # ... (rest of the method is unchanged)
+        """
+        Generates an embedding for a given text using OpenAI's API.
+        """
         response = await self.openai_client.embeddings.create(
             input=[text.replace("\n", " ")], model=self.embedding_model
         )
         return response.data[0].embedding
 
     async def store_chunks(self, document_id: str, chunks: List[str]) -> int:
-        # ... (rest of the method is unchanged)
+        """
+        Embeds and stores a list of text chunks in Weaviate using the v4 batching API.
+        """
         collection = self.weaviate_client.collections.get(WEAVIATE_CLASS_NAME)
         objects_to_insert = []
         for chunk in chunks:
@@ -80,7 +80,9 @@ class WeaviateService:
         return len(objects_to_insert)
 
     async def query_chunks(self, query: str, top_k: int = 3) -> List[str]:
-        # ... (rest of the method is unchanged)
+        """
+        Queries Weaviate for the most relevant text chunks using the v4 query API.
+        """
         query_embedding = await self._get_embedding(query)
         collection = self.weaviate_client.collections.get(WEAVIATE_CLASS_NAME)
         response = collection.query.near_vector(
