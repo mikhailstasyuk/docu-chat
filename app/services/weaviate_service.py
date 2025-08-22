@@ -1,7 +1,6 @@
 import os
 import weaviate
 from weaviate.client import WeaviateClient, ConnectionParams
-# --- FIX: Import Property and DataType directly ---
 from weaviate.collections.classes.config import Configure, Property, DataType
 from weaviate.util import generate_uuid5
 from openai import AsyncOpenAI
@@ -49,7 +48,6 @@ class WeaviateService:
                 name=WEAVIATE_CLASS_NAME,
                 description="A chunk of text from an uploaded document.",
                 vectorizer_config=Configure.Vectorizer.none(),
-                # --- FIX: Use the imported Property and DataType classes ---
                 properties=[
                     Property(name="text", data_type=DataType.TEXT),
                     Property(name="document_id", data_type=DataType.TEXT),
