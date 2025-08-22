@@ -13,7 +13,6 @@ services:
     volumes:
       - ./weaviate_data:/var/lib/weaviate
     healthcheck:
-      # --- FIX: Use wget instead of curl ---
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/v1/.well-known/ready"]
       interval: 5s
       timeout: 10s

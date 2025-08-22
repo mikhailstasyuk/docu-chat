@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from openai import AsyncOpenAI
 from .weaviate_service import WeaviateService
 
@@ -17,7 +17,7 @@ class RAGService:
         self.openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.chat_model = "gpt-4o-mini"
 
-    async def get_answer(self, query: str, history: List[Dict[str, str]]) -> (str, bool):
+    async def get_answer(self, query: str, history: List[Dict[str, str]]) -> Tuple[str, bool]:
         """
         Retrieves context, builds a prompt, and generates an answer.
         Returns the answer and a boolean indicating if context was found.

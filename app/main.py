@@ -46,7 +46,6 @@ app = FastAPI(
 )
 
 # --- API Endpoints ---
-# ... (The rest of your endpoints remain exactly the same)
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
